@@ -38,6 +38,9 @@ if (CONFIG_NRF_802154_MULTIPROTOCOL_SUPPORT)
     nrf_802154_priority_drop_swi.c
     nrf_802154_request_swi.c
     )
+  zephyr_compile_definitions(
+        ENABLE_FEM=1
+    )
 
 else()
   zephyr_library_sources(
