@@ -41,7 +41,6 @@
 #include "nrf_802154_config.h"
 #include "nrf_802154_debug.h"
 #include "nrf_802154_debug_core.h"
-#include "fem/nrf_fem_protocol_api.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -259,6 +258,7 @@ extern "C" {
 #define NRF_802154_PPI_RADIO_CRCERROR_TO_TIMER_CLEAR NRF_PPI_CHANNEL9
 #endif
 
+#if ENABLE_FEM
 /**
  * @def NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE
  *
@@ -272,6 +272,9 @@ extern "C" {
 #ifndef NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE
 #define NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE NRF_PPI_CHANNEL9
 #endif
+#else
+#define NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE 0
+#endif // ENABLE_FEM
 
 /**
  * @def NRF_802154_PPI_TIMER_COMPARE_TO_RADIO_TXEN
@@ -450,8 +453,7 @@ extern "C" {
  * Bit mask of GPIO pins used by the 802.15.4 driver.
  */
 #ifndef NRF_802154_GPIO_PINS_USED_MASK
-#define NRF_802154_GPIO_PINS_USED_MASK (NRF_802154_FEM_PINS_USED_MASK | \
-                                        NRF_802154_DEBUG_PINS_USED_MASK)
+#define NRF_802154_GPIO_PINS_USED_MASK (NRF_802154_DEBUG_PINS_USED_MASK)
 #endif // NRF_802154_GPIO_PINS_USED_MASK
 
 /**
@@ -460,8 +462,7 @@ extern "C" {
  * Bit mask of GPIOTE peripherals used by the 802.15.4 driver.
  */
 #ifndef NRF_802154_GPIOTE_CHANNELS_USED_MASK
-#define NRF_802154_GPIOTE_CHANNELS_USED_MASK (NRF_802154_FEM_GPIOTE_CHANNELS_USED_MASK | \
-                                              NRF_802154_DEBUG_GPIOTE_CHANNELS_USED_MASK)
+#define NRF_802154_GPIOTE_CHANNELS_USED_MASK (NRF_802154_DEBUG_GPIOTE_CHANNELS_USED_MASK)
 #endif // NRF_802154_GPIOTE_CHANNELS_USED_MASK
 
 /**
@@ -479,7 +480,6 @@ extern "C" {
                                            (1 << NRF_802154_PPI_RADIO_CRCOK_TO_PPI_GRP_DISABLE) |   \
                                            NRF_802154_DISABLE_BCC_MATCHING_PPI_CHANNELS_USED_MASK | \
                                            NRF_802154_TIMESTAMP_PPI_CHANNELS_USED_MASK |            \
-                                           NRF_802154_FEM_PPI_CHANNELS_USED_MASK |                  \
                                            NRF_802154_DEBUG_PPI_CHANNELS_USED_MASK)
 #endif // NRF_802154_PPI_CHANNELS_USED_MASK
 
