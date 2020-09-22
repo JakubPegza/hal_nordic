@@ -419,6 +419,21 @@ extern "C" {
 #endif // NRF_802154_FRAME_TIMESTAMP_ENABLED
 
 /**
+ * @def NRF_802154_PPI_FEM_ABORT_GROUP
+ *
+ * The PPI channel group used to deactivate PA/LNA.
+ *
+ */
+#ifndef NRF_802154_PPI_FEM_ABORT_GROUP
+#if ENABLE_FEM
+#define NRF_802154_PPI_FEM_ABORT_GROUP NRF_PPI_CHANNEL_GROUP2
+#else // ENABLE_FEM
+#define NRF_802154_PPI_FEM_ABORT_GROUP 0
+#endif // ENABLE_FEM
+#endif // NRF_802154_PPI_FEM_ABORT_GROUP
+
+
+/**
  * @def NRF_802154_TIMERS_USED_MASK
  *
  * Bit mask of instances of timer peripherals used by the 802.15.4 driver.
@@ -492,7 +507,8 @@ extern "C" {
 
 #ifdef NRF_802154_FRAME_TIMESTAMP_ENABLED
 #define NRF_802154_PPI_GROUPS_USED_MASK ((1 << NRF_802154_PPI_CORE_GROUP) | \
-                                         (1 << NRF_802154_PPI_TIMESTAMP_GROUP))
+                                         (1 << NRF_802154_PPI_TIMESTAMP_GROUP) | \
+                                         (1 << NRF_802154_PPI_FEM_ABORT_GROUP))
 #else // NRF_802154_FRAME_TIMESTAMP_ENABLED
 #define NRF_802154_PPI_GROUPS_USED_MASK (1 << NRF_802154_PPI_CORE_GROUP)
 #endif  // NRF_802154_FRAME_TIMESTAMP_ENABLED

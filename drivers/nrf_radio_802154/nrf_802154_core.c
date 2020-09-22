@@ -81,6 +81,8 @@
 #define PPI_CHGRP0                 NRF_802154_PPI_CORE_GROUP                     ///< PPI group used to disable self-disabling PPIs
 #define PPI_CHGRP0_DIS_TASK        NRF_PPI_TASK_CHG0_DIS                         ///< PPI task used to disable self-disabling PPIs
 
+#define PPI_FEM_ABORT_GROUP        NRF_802154_PPI_FEM_ABORT_GROUP                ///< PPI group used to disable FEM
+
 #define PPI_DISABLED_EGU           NRF_802154_PPI_RADIO_DISABLED_TO_EGU          ///< PPI that connects RADIO DISABLED event with EGU task
 #define PPI_EGU_RAMP_UP            NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP           ///< PPI that connects EGU event with RADIO TXEN or RXEN task
 #define PPI_EGU_TIMER_START        NRF_802154_PPI_EGU_TO_TIMER_START             ///< PPI that connects EGU event with TIMER START task
@@ -181,13 +183,6 @@ static volatile radio_state_t m_state; ///< State of the radio driver.
 
 #if ENABLE_FEM
 /// Common parameters for the FEM handling.
-static const mpsl_fem_event_t m_deactivate_on_disable =
-{
-    .type                           = MPSL_FEM_EVENT_TYPE_GENERIC,
-    .override_ppi                   = false,
-    .event.generic.register_address =
-        ((uint32_t)NRF_RADIO_BASE + (uint32_t)NRF_RADIO_EVENT_DISABLED)
-};
 
 static const mpsl_fem_event_t m_activate_rx_cc0 =
 {
@@ -929,6 +924,10 @@ static void fem_for_tx_set(bool cca)
                                                                         NRF_TIMER_TASK_START);
 
         nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, egu_event_addr, timer_task_addr);
+
+        mpsl_fem_abort_extend(PPI_EGU_RAMP_UP, PPI_FEM_ABORT_GROUP);
+        mpsl_fem_abort_extend(PPI_EGU_TIMER_START, PPI_FEM_ABORT_GROUP);
+
         nrf_ppi_channel_enable(NRF_PPI, PPI_EGU_TIMER_START);
     }
 #else
@@ -1925,8 +1924,7 @@ static void cont_prec_approved(void)
         nrf_802154_timer_coord_start();
 
 #if ENABLE_FEM
-        mpsl_fem_pa_configuration_set(NULL, &m_deactivate_on_disable);
-        mpsl_fem_lna_configuration_set(NULL, &m_deactivate_on_disable);
+        mpsl_fem_abort_set(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED), PPI_FEM_ABORT_GROUP);
 #endif // ENABLE_FEM
         switch (m_state)
         {
@@ -1983,8 +1981,7 @@ static void cont_prec_denied(void)
         }
 
 #if ENABLE_FEM
-        mpsl_fem_pa_configuration_clear();
-        mpsl_fem_lna_configuration_clear();
+        mpsl_fem_abort_clear();
         mpsl_fem_deactivate_now(MPSL_FEM_ALL);
 #endif // ENABLE_FEM
         nrf_802154_timer_coord_stop();
