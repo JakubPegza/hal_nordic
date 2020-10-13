@@ -57,6 +57,8 @@ static rsch_prio_t          m_requested_prio;                ///< Priority reque
 static rsch_prio_t          m_cont_mode_prio;                ///< Continuous mode priority level. If continuous mode is not requested equal to @ref RSCH_PRIO_IDLE.
 static volatile bool        m_shall_notify_raal;             ///< Flag that indicates that RAAL shall be notified about continuous mode end.
 
+bool m_prec_raal_approved = false;
+
 typedef struct
 {
     rsch_prio_t        prio;  ///< Delayed timeslot priority level. If delayed timeslot is not scheduled equal to @ref RSCH_PRIO_IDLE.
@@ -186,6 +188,11 @@ static inline void prec_approved_prio_set(rsch_prec_t prec, rsch_prio_t prio)
     assert((m_approved_prios[prec] != prio) || (prio == RSCH_PRIO_IDLE));
 
     m_approved_prios[prec] = prio;
+
+    if (prec == RSCH_PREC_RAAL)
+    {
+        m_prec_raal_approved = (prio == RSCH_PRIO_TX) ? true : false;
+    }
 
     nrf_802154_log_exit(prec_approved_prio_set, 2);
 }
