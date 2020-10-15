@@ -102,7 +102,4 @@ zephyr_compile_definitions(
 
   # ACK timeout
   NRF_802154_ACK_TIMEOUT_ENABLED=1
-
-  # Enable debug logs
-  ENABLE_DEBUG_LOG=1
 )

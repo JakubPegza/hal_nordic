@@ -86,14 +86,11 @@ extern volatile uint32_t nrf_802154_debug_log_ptr;
 #define nrf_802154_log(EVENT_CODE, EVENT_ARG)                                    \
     do                                                                           \
     {                                                                            \
-        uint32_t is_irq_masked = __get_PRIMASK();                                \
-        __disable_irq();                                                         \
         uint32_t ptr = nrf_802154_debug_log_ptr;                                 \
                                                                                  \
         nrf_802154_debug_log_buffer[ptr] = ((EVENT_CODE) | ((EVENT_ARG) << 16)); \
         nrf_802154_debug_log_ptr         =                                       \
             ptr < (NRF_802154_DEBUG_LOG_BUFFER_LEN - 1) ? ptr + 1 : 0;           \
-        __set_PRIMASK(is_irq_masked);                                            \
     }                                                                            \
     while (0)
 
